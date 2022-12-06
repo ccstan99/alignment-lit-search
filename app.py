@@ -35,7 +35,7 @@ with st.spinner("Initializing..."):
 xq = model.encode(query_sentence).tolist()
 result = index.query(xq, top_k=5, includeMetadata=True)
 for item in result["matches"]:
-    st.write("### ["+item["metadata"]["title"]+"]("+item["metadata"]["url"]+")")
+    st.subheader("["+item["metadata"]["title"]+"]("+item["metadata"]["url"]+")")
     st.write("({0:.2f}) ".format(item["score"]), item["metadata"]["abstract"])
 
 # run_search(query_sentence, model, index)
