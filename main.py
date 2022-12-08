@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, url_for, request
+from flask import Flask, render_template, jsonify, request
 from sentence_transformers import SentenceTransformer
 import pinecone
 import numpy as np
@@ -17,7 +17,7 @@ def init():
     pinecone.init(api_key=PINECONE_API_KEY, environment='us-west1-gcp')
     model = SentenceTransformer(MODEL)
     index = pinecone.Index(INDEX)
-
+    print("init")
     df = pd.read_json('arxiv_pos_list_metadata.json')
     df.set_index('paper_version', inplace = True)
     # print("df.shape", df.shape)

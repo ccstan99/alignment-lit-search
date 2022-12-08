@@ -1,9 +1,10 @@
-pymilvus==2.0.1
+numpy
+pandas
+pymilvus
 pinecone-client
 streamlit
-numpy
 flask
 flask-cors
 flask_restful
-psycopg2-binary
 sentence_transformers
+gunicorn
