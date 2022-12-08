@@ -3,8 +3,10 @@ pandas
 pymilvus
 pinecone-client
 streamlit
+annotated_text
 flask
 flask-cors
 flask_restful
+transformers
 sentence_transformers
 gunicorn

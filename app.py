@@ -1,10 +1,13 @@
 import streamlit as st
+from annotated_text import annotated_text
 import numpy as np
 from sentence_transformers import SentenceTransformer
+from transformers import pipeline
 import pinecone
 
 PINECONE_API_KEY = st.secrets["PINECONE_API_KEY"]
-MODEL = 'allenai-specter'
+RETRIEVER_MODEL = 'allenai-specter'
+READER_MODEL = 'deepset/electra-base-squad2'
 INDEX = 'alignment-lit'
 NAMESPACE = 'faq'
 DIMS = 768
@@ -12,20 +15,26 @@ DIMS = 768
 @st.experimental_singleton(show_spinner=False)
 def init():
     pinecone.init(api_key=PINECONE_API_KEY, environment='us-west1-gcp')
-    model = SentenceTransformer(MODEL)
     index = pinecone.Index(INDEX)
-    return model, index
+    retreiver = SentenceTransformer(RETRIEVER_MODEL)
+    reader = pipeline(model=READER_MODEL, task="question-answering")
+    return index, retreiver, reader
 
 st.header('Stampy FAQ Extractive Search')
-query_sentence = st.text_input("What is your question?", value="What is AI Safety?")
+query = st.text_input("What is your question?", value="What is AI Safety?")
 
 with st.spinner("Initializing..."):
-    model, index = init()
+    index, retreiver, reader = init()
 
-xq = model.encode(query_sentence).tolist()
+xq = retreiver.encode(query).tolist()
 result = index.query(xq, namespace=NAMESPACE, top_k=5, includeMetadata=True)
 for item in result["matches"]:
+    context = item["metadata"]["text"]
+    answer = reader(question=query, context=context)
     st.subheader("["+item["metadata"]["title"]+"]("+item["metadata"]["url"]+")")
-    st.write("({0:.2f}) ".format(item["score"]), item["metadata"]["text"])
+    annotated_text("({0:.2f}) ".format(answer["score"]), 
+    context[:answer["start"]], (answer["answer"],"","#FDFDC9"), context[answer["end"]:])
 
-# run_search(query_sentence, model, index)
+    # st.markdown("({0:.2f}) ".format(answer["score"]) +
+    # context[:answer["start"]] + "***" + answer["answer"] + "***" + context[answer["end"]:],
+    # unsafe_allow_html=True)
