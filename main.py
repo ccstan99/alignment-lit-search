@@ -6,8 +6,7 @@ import pandas as pd
 
 app = Flask(__name__)
 
-# PINECONE_API_KEY = os.getenv["PINECONE_API_KEY"]
-PINECONE_API_KEY = "040b0588-32b2-4195-b234-63e068540253"
+PINECONE_API_KEY = os.getenv["PINECONE_API_KEY"]
 MODEL = 'allenai-specter'
 INDEX = 'alignment-lit'
 DIMS = 768
@@ -18,7 +17,7 @@ def init():
     model = SentenceTransformer(MODEL)
     index = pinecone.Index(INDEX)
     print("init")
-    df = pd.read_json('arxiv_pos_list_metadata.json')
+    df = pd.read_json('data/arxiv_pos_list_metadata.json')
     df.set_index('paper_version', inplace = True)
     # print("df.shape", df.shape)
     return model, index, df
