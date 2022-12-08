@@ -28,13 +28,20 @@ with st.spinner("Initializing..."):
 
 xq = retreiver.encode(query).tolist()
 result = index.query(xq, namespace=NAMESPACE, top_k=5, includeMetadata=True)
+num_found = 0
 for item in result["matches"]:
     context = item["metadata"]["text"]
     answer = reader(question=query, context=context)
-    st.subheader("["+item["metadata"]["title"]+"]("+item["metadata"]["url"]+")")
-    annotated_text("({0:.2f}) ".format(answer["score"]), 
-    context[:answer["start"]], (answer["answer"],"","#FDFDC9"), context[answer["end"]:])
+    score = answer["score"]
+    if (score > 0.01):
+        num_found += 1
+        st.subheader("["+item["metadata"]["title"]+"]("+item["metadata"]["url"]+")")
+        annotated_text("({0:.2f}) ".format(answer["score"]), 
+        context[:answer["start"]], (answer["answer"],"","#FDFDC9"), context[answer["end"]:])
 
     # st.markdown("({0:.2f}) ".format(answer["score"]) +
     # context[:answer["start"]] + "***" + answer["answer"] + "***" + context[answer["end"]:],
     # unsafe_allow_html=True)
+
+if num_found == 0:
+    st.write("Sorry, no answer found")
